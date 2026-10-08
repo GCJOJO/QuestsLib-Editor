@@ -1,0 +1,277 @@
+/* --- UI: BUTTON --- */
+.ui-btn {
+    padding: 8px 14px;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.ui-btn-primary {
+    background-color: #2e7d32;
+}
+
+.ui-btn-primary:hover {
+    background-color: #388e3c;
+}
+
+.ui-btn-secondary {
+    background-color: #333333;
+}
+
+.ui-btn-secondary:hover {
+    background-color: #444444;
+}
+
+.ui-btn-danger {
+    background-color: #c62828;
+}
+
+.ui-btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+/* --- UI: MODAL --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #252526;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 480px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid #3c3c3c;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #3c3c3c;
+    padding-bottom: 8px;
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.task-list-title {
+    text-align: left;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: #aaaaaa;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.modal-close-btn:hover {
+    color: #ffffff;
+    background: #3c3c3c;
+}
+
+/* --- FORMS: FIELDS --- */
+.form-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+    text-align: left;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 13px;
+    color: #cccccc;
+    text-align: left;
+}
+
+.form-required {
+    color: #ef5350;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    box-sizing: border-box; /* Garantit que les bordures ne changent pas la taille globale */
+    outline: none;           /* Supprime l'outline par défaut qui peut déformer l'élément */
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: #4caf50; /* Change uniquement la couleur, pas l'épaisseur */
+}
+
+    /* --- TASK PICKER MODAL EN LISTE + SEARCH --- */
+.task-picker-search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #3c3c3c;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 16px;
+    transition: border-color 0.15s ease;
+}
+
+.task-picker-search-input:focus {
+    border-color: #4caf50;
+}
+
+.task-picker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 50vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.task-picker-item-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #2a2a2c;
+    border: 1px solid #3c3c3c;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.task-picker-item-btn:hover {
+    background-color: #38383a;
+    border-color: #4caf50;
+}
+
+.task-picker-item-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.task-picker-item-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.task-picker-item-badge {
+    font-size: 10px;
+    background-color: #1e1e1e;
+    color: #888888;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #333333;
+}
+
+.task-picker-no-result {
+    text-align: center;
+    color: #888888;
+    padding: 20px 0;
+    font-size: 13px;
+}
+
+/* Style Godot : Carte de tâche imbriquée */
+.godot-task-card {
+    border: 1px solid #3c3c3c;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    background-color: #222223;
+    transition: border-color 0.2s ease;
+}
+
+.godot-task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.godot-task-header:hover {
+    filter: brightness(1.15);
+}
+
+.fold-icon {
+    font-size: 10px;
+    color: #aaaaaa;
+    width: 12px;
+}
+
+.godot-task-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.godot-task-id {
+    font-size: 12px;
+    color: #888888;
+    font-family: monospace;
+}
+
+.godot-task-body {
+    padding: 12px;
+    text-align: left;
+}
+
+/* Style de l'aperçu JSON pliable */
+.json-preview-container {
+    flex: 1;
+    padding: 16px;
+    background-color: #1e1e1e;
+    color: #fff;
+    overflow-y: auto;
+    transition: flex 0.2s ease;
+}
+
+.json-preview-container.folded {
+    flex: 0 0 100px; /* Réduit la largeur quand replié */
+    overflow: hidden;
+}
+
+.json-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}

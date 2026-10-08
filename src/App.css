@@ -1,0 +1,88 @@
+/* Réinitialisation pour occuper tout l'écran */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* Layout principal à 3 colonnes */
+.app-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Colonne 1 : Navigation des quêtes */
+.quest-navigation {
+  flex: 0.2;
+  border-right: 1px solid #ddd;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.create-quest-btn {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.quest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.quest-item {
+  padding: 8px;
+  cursor: pointer;
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+.quest-item.selected {
+  background-color: #38007b;
+}
+
+.quest-item-id {
+  color: #d6d6d6;
+}
+
+/* Colonne 2 : Éditeur principal */
+.main-editor {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+}
+
+/* Colonne 3 : Aperçu JSON */
+.json-preview-container {
+  flex: 1;
+  padding: 16px;
+  background-color: #1e1e1e;
+  color: #fff;
+  overflow-y: auto;
+}
+
+.json-preview-title {
+  margin-top: 0;
+  text-align: left;
+}
+
+.json-preview-code {
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: monospace;
+  font-size: 11px;
+  margin: 0;
+}
