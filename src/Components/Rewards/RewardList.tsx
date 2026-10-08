@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { DynamicForm } from "../DynamicForm";
 import { RewardPickerModal } from "./RewardPickerModal";
 import Button from "../UI/Button";
-import { registry } from "../../data/Registry";
+import { registry } from "../../lib/Registry.ts";
 import { useQuestStore } from "../../store/useQuestStore";
 import { getDepthColor } from "../../utils/Colors";
 import "../../styles/components.css";
@@ -33,6 +33,12 @@ const RewardList: React.FC<RewardListProps> = ({
     const handleAddReward = (typeId: string) => {
         const newReward = registry.createDefaultReward(typeId);
         updateValueAt(path, [...rewards, newReward]);
+    };
+
+    const handleDeleteReward = (rewardIndex: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const nextRewards = rewards.filter((_, idx) => idx !== rewardIndex);
+        updateValueAt(path, nextRewards);
     };
 
     return (
@@ -66,9 +72,25 @@ const RewardList: React.FC<RewardListProps> = ({
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                 <span className="fold-icon">{isCollapsed ? "▶" : "▼"}</span>
                                 <span className="godot-task-badge" style={{ backgroundColor: color }}>
-                  {rewardDef.label}
-                </span>
+                                    {rewardDef.label}
+                                </span>
                             </div>
+                            <button
+                                type="button"
+                                onClick={(e) => handleDeleteReward(index, e)}
+                                title="Supprimer la récompense"
+                                style={{
+                                    background: "transparent",
+                                    border: "none",
+                                    color: "#ff6b6b",
+                                    cursor: "pointer",
+                                    fontSize: "14px",
+                                    padding: "2px 6px",
+                                    borderRadius: "3px",
+                                }}
+                            >
+                                ✕
+                            </button>
                         </div>
 
                         {!isCollapsed && (

@@ -47,6 +47,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({ definition, data, path
                         field={field}
                         value={data[field.key]}
                         onChange={(val) => updateValueAt([...path, field.key], val)}
+                        parentData={data}
                     />
                 );
             })}

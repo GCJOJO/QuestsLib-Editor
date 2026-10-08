@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { DynamicForm } from "../DynamicForm";
 import { TaskPickerModal } from "./TaskPickerModal";
 import Button from "../UI/Button";
-import { registry } from "../../data/Registry";
+import { registry } from "../../lib/Registry.ts";
 import { useQuestStore } from "../../store/useQuestStore";
+import { useProjectStore } from "../../store/useProjectStore";
 import { getDepthColor } from "../../utils/Colors";
 import "../../styles/components.css";
 
@@ -19,6 +20,7 @@ const TaskList: React.FC<TaskListProps> = ({ label, tasks, path, depth = 0 }) =>
     const [collapsedTasks, setCollapsedTasks] = useState<Record<string, boolean>>({});
 
     const updateValueAt = useQuestStore((state) => state.updateValueAt);
+    const getActiveNamespace = useProjectStore((state) => state.getActiveNamespace);
     const color = getDepthColor(depth);
 
     const toggleFold = (key: string) => {
@@ -26,11 +28,20 @@ const TaskList: React.FC<TaskListProps> = ({ label, tasks, path, depth = 0 }) =>
     };
 
     const handleAddTask = (typeId: string) => {
-        const customId = prompt("Task ID :", `task_${Date.now()}`);
-        if (!customId) return;
+        const ns = getActiveNamespace();
+        const defaultId = `${ns}:task_${tasks.length + 1}`;
+        const inputId = prompt("Identifiant de la tâche :", defaultId);
+        if (!inputId || !inputId.trim()) return;
 
-        const newTask = registry.createDefaultTask(typeId, customId);
+        const finalId = inputId.trim().includes(":") ? inputId.trim() : `${ns}:${inputId.trim()}`;
+        const newTask = registry.createDefaultTask(typeId, finalId);
         updateValueAt(path, [...tasks, newTask]);
+    };
+
+    const handleDeleteTask = (taskIndex: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const nextTasks = tasks.filter((_, idx) => idx !== taskIndex);
+        updateValueAt(path, nextTasks);
     };
 
     return (
@@ -39,7 +50,7 @@ const TaskList: React.FC<TaskListProps> = ({ label, tasks, path, depth = 0 }) =>
 
             {tasks.map((task, index) => {
                 const taskDef = registry.getTaskDef(task.task);
-                if (!taskDef) return <div key={index} className="task-unknown">Unknow task type : {task.task}</div>;
+                if (!taskDef) return <div key={index} className="task-unknown">Unknown task type : {task.task}</div>;
 
                 const taskKey = `task_${index}`;
                 const isCollapsed = collapsedTasks[taskKey];
@@ -49,23 +60,39 @@ const TaskList: React.FC<TaskListProps> = ({ label, tasks, path, depth = 0 }) =>
                         key={taskKey}
                         className="godot-task-card"
                         style={{
-                            borderColor: color, // Bordure Godot personnalisée[cite: 3]
+                            borderColor: color,
                             borderLeftWidth: "6px",
                         }}
                     >
                         {/* En-tête cliquable pour Fold/Unfold */}
                         <div
                             className="godot-task-header"
-                            style={{ backgroundColor: `${color}22` }} // Fond légèrement teinté[cite: 3]
+                            style={{ backgroundColor: `${color}22` }}
                             onClick={() => toggleFold(taskKey)}
                         >
                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                 <span className="fold-icon">{isCollapsed ? "▶" : "▼"}</span>
                                 <span className="godot-task-badge" style={{ backgroundColor: color }}>
-                  {taskDef.label}
-                </span>
+                                    {taskDef.label}
+                                </span>
                                 <span className="godot-task-id">{task.id}</span>
                             </div>
+                            <button
+                                type="button"
+                                onClick={(e) => handleDeleteTask(index, e)}
+                                title="Supprimer la tâche"
+                                style={{
+                                    background: "transparent",
+                                    border: "none",
+                                    color: "#ff6b6b",
+                                    cursor: "pointer",
+                                    fontSize: "14px",
+                                    padding: "2px 6px",
+                                    borderRadius: "3px",
+                                }}
+                            >
+                                ✕
+                            </button>
                         </div>
 
                         {/* Contenu affiché uniquement si NON replié */}

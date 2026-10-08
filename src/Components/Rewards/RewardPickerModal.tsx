@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import Modal from "../UI/Modal";
-import { registry } from "../../data/Registry";
+import { registry } from "../../lib/Registry.ts";
+import { useExtensionStore } from "../../extensions/useExtensionStore.ts";
 import "../../styles/components.css";
 
 interface RewardPickerModalProps {
@@ -15,6 +16,7 @@ export const RewardPickerModal: React.FC<RewardPickerModalProps> = ({
                                                                         onSelectRewardType,
                                                                     }) => {
     const [searchTerm, setSearchTerm] = useState("");
+    useExtensionStore((state) => state.extensions); // souscrit aux changements d'extensions
     const rewardTypes = registry.getRewardTypes();
 
     const filteredRewards = useMemo(() => {

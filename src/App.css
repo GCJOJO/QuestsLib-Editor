@@ -5,84 +5,256 @@ html, body, #root {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
+  background-color: #18181a;
+  color: #eeeeee;
 }
 
 *, *::before, *::after {
   box-sizing: inherit;
 }
 
-/* Layout principal à 3 colonnes */
-.app-container {
+/* Application container avec barre supérieure */
+.app-wrapper {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100vh;
 }
 
+/* Barre d'outils supérieure */
+.top-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #1e1e20;
+  border-bottom: 1px solid #333336;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.status-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.status-saved {
+  background-color: rgba(46, 125, 50, 0.2);
+  color: #81c784;
+  border: 1px solid #2e7d32;
+}
+
+.status-saving {
+  background-color: rgba(255, 152, 0, 0.2);
+  color: #ffb74d;
+  border: 1px solid #f57c00;
+}
+
+.status-error {
+  background-color: rgba(198, 40, 40, 0.2);
+  color: #e57373;
+  border: 1px solid #c62828;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Layout principal à 3 colonnes */
+.app-container {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
 /* Colonne 1 : Navigation des quêtes */
 .quest-navigation {
-  flex: 0.2;
-  border-right: 1px solid #ddd;
+  width: 280px;
+  min-width: 250px;
+  background-color: #1b1b1d;
+  border-right: 1px solid #333336;
   padding: 16px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .create-quest-btn {
   width: 100%;
-  margin-bottom: 16px;
-  padding: 8px;
+  padding: 10px;
+  background-color: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 13px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-quest-btn:hover {
+  background-color: #388e3c;
 }
 
 .quest-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .quest-item {
-  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
   cursor: pointer;
-  background-color: transparent;
-  border-radius: 4px;
+  background-color: #242427;
+  border-radius: 6px;
+  border: 1px solid #333336;
+  transition: all 0.15s ease;
+}
+
+.quest-item:hover {
+  background-color: #2e2e32;
+  border-color: #4a4a50;
 }
 
 .quest-item.selected {
-  background-color: #38007b;
+  background-color: #3d2b63;
+  border-color: #7b46d1;
+}
+
+.quest-item-content {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.quest-item-name {
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
 }
 
 .quest-item-id {
-  color: #d6d6d6;
+  color: #aaaaaa;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quest-item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s ease;
+}
+
+.quest-item:hover .quest-item-actions,
+.quest-item.selected .quest-item-actions {
+  opacity: 1;
+}
+
+.quest-action-btn {
+  background: transparent;
+  border: none;
+  color: #bbb;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.quest-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.quest-action-btn.delete:hover {
+  background: rgba(239, 83, 80, 0.2);
+  color: #ef5350;
 }
 
 /* Colonne 2 : Éditeur principal */
 .main-editor {
-  flex: 1;
+  flex: 1.2;
   padding: 24px;
   overflow-y: auto;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #333336;
+  background-color: #1e1e20;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+  color: #777;
 }
 
 /* Colonne 3 : Aperçu JSON */
 .json-preview-container {
-  flex: 1;
+  flex: 0.8;
   padding: 16px;
-  background-color: #1e1e1e;
+  background-color: #141416;
   color: #fff;
   overflow-y: auto;
+  transition: all 0.2s ease;
+}
+
+.json-preview-container.folded {
+  flex: 0 0 50px;
+  padding: 16px 8px;
+  overflow: hidden;
+}
+
+.json-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .json-preview-title {
-  margin-top: 0;
-  text-align: left;
+  margin: 0;
+  font-size: 14px;
+  color: #aaaaaa;
 }
 
 .json-preview-code {
   text-align: left;
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: monospace;
+  font-family: "JetBrains Mono", Consolas, "Courier New", monospace;
   font-size: 11px;
   margin: 0;
+  color: #d4d4d4;
+  line-height: 1.4;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import Modal from "../UI/Modal";
-import { registry } from "../../data/Registry";
+import { registry } from "../../lib/Registry.ts";
+import { useExtensionStore } from "../../extensions/useExtensionStore.ts";
 import "../../styles/components.css";
 import {VerticalSpacer} from "../Spacer.tsx";
 
@@ -12,6 +13,7 @@ interface TaskPickerModalProps {
 
 export const TaskPickerModal: React.FC<TaskPickerModalProps> = ({ isOpen, onClose, onSelectTaskType }) => {
     const [searchTerm, setSearchTerm] = useState("");
+    useExtensionStore((state) => state.extensions); // souscrit aux changements d'extensions
 
     const taskTypes = registry.getTaskTypes();
 
