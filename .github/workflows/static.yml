@@ -37,7 +37,8 @@ jobs:
           node-version: 24
         
       - name : Build Pages
-        run : npm install |
+        run : |
+              npm install
               npm run build
         
       - name: Setup Pages
