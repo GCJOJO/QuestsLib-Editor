@@ -40,6 +40,8 @@ export type FieldDefinition = {
     type: FieldType;
     required?: boolean;
     multiline?: boolean;
+    /** Le texte est une clé de traduction (Component.translatable côté mod). */
+    translatable?: boolean;
     defaultValue?: unknown;
     options?: FieldOption[];
     registryType?: string; // e.g. "items", "blocks", "biomes", "structures", "entities"
@@ -89,7 +91,11 @@ export type ProjectMetadata = {
     questCount: number;
 };
 
+/** locale (ex: fr_fr) -> clé -> texte */
+export type Translations = Record<string, Record<string, string>>;
+
 export type ProjectData = {
     metadata: ProjectMetadata;
     quests: QuestData[];
+    translations?: Translations;
 };

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { get as idbGet, set as idbSet, del as idbDel } from "idb-keyval";
-import type { ProjectMetadata, ProjectData, QuestData } from "../types/QuestTypes";
+import type { ProjectMetadata, ProjectData, QuestData, Translations } from "../types/QuestTypes";
 import { useQuestStore } from "./useQuestStore";
 
 const PROJECTS_INDEX_KEY = "questslib:projects_index";
@@ -10,9 +10,9 @@ const LEGACY_QUESTS_KEY = "questslib:quests";
 
 const DEFAULT_PROJECT_METADATA: ProjectMetadata = {
     id: "project_default",
-    name: "Mon Projet de Quêtes",
+    name: "My Quests",
     namespace: "questslib",
-    description: "Projet principal",
+    description: "",
     createdAt: Date.now(),
     updatedAt: Date.now(),
     questCount: 1,
@@ -25,7 +25,7 @@ interface ProjectState {
 
     loadProjects: () => Promise<void>;
     selectProject: (projectId: string) => Promise<void>;
-    createProject: (name: string, description?: string, initialQuests?: QuestData[], namespace?: string) => Promise<string>;
+    createProject: (name: string, description?: string, initialQuests?: QuestData[], namespace?: string, translations?: Translations) => Promise<string>;
     duplicateProject: (projectId: string, newName?: string) => Promise<string>;
     updateProjectMetadata: (projectId: string, patch: Partial<ProjectMetadata>) => Promise<void>;
     deleteProject: (projectId: string) => Promise<{ success: boolean; error?: string }>;
@@ -82,7 +82,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
                 isLoading: false,
             });
 
-            useQuestStore.getState().initFromProject(currentActiveId, questsToLoad);
+            useQuestStore.getState().initFromProject(currentActiveId, questsToLoad, activeData?.translations);
         } catch (e) {
             console.error("Erreur lors du chargement des projets :", e);
             set({ projects: [DEFAULT_PROJECT_METADATA], activeProjectId: DEFAULT_PROJECT_METADATA.id, isLoading: false });
@@ -103,13 +103,13 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             await idbSet(ACTIVE_PROJECT_KEY, projectId);
             set({ activeProjectId: projectId });
 
-            useQuestStore.getState().initFromProject(projectId, quests);
+            useQuestStore.getState().initFromProject(projectId, quests, projectData?.translations);
         } catch (err) {
             console.error("Erreur changement de projet:", err);
         }
     },
 
-    createProject: async (name: string, description?: string, initialQuests?: QuestData[], namespace?: string) => {
+    createProject: async (name: string, description?: string, initialQuests?: QuestData[], namespace?: string, translations?: Translations) => {
         const id = `project_${Date.now()}`;
         const cleanNamespace = (namespace?.trim() || "questslib").toLowerCase().replace(/[^a-z0-9_.-]/g, "_");
         const quests = initialQuests && initialQuests.length > 0
@@ -117,8 +117,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             : [
                 {
                     id: `${cleanNamespace}:quest_1`,
-                    name: "Nouvelle Quête",
-                    description: "Quête d'introduction",
+                    name: "New Quest",
+                    description: "",
                     tasks: [],
                     rewards: [],
                 },
@@ -137,6 +137,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         const newProjectData: ProjectData = {
             metadata: newMeta,
             quests,
+            translations: translations ?? {},
         };
 
         const updatedIndex = [...get().projects, newMeta];
@@ -151,7 +152,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
                 activeProjectId: id,
             });
 
-            useQuestStore.getState().initFromProject(id, quests);
+            useQuestStore.getState().initFromProject(id, quests, translations ?? {});
             return id;
         } catch (err: any) {
             console.error("Erreur création projet:", err);
@@ -187,6 +188,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         const newProjectData: ProjectData = {
             metadata: newMeta,
             quests: copiedQuests,
+            translations: JSON.parse(JSON.stringify(sourceData?.translations ?? {})),
         };
 
         const updatedIndex = [...projects, newMeta];
@@ -200,7 +202,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
             activeProjectId: newId,
         });
 
-        useQuestStore.getState().initFromProject(newId, copiedQuests);
+        useQuestStore.getState().initFromProject(newId, copiedQuests, newProjectData.translations);
         return newId;
     },
 
@@ -252,7 +254,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
             if (activeProjectId === projectId) {
                 const nextData = (await idbGet(PROJECT_DATA_PREFIX + nextActiveId)) as ProjectData | undefined;
-                useQuestStore.getState().initFromProject(nextActiveId, nextData?.quests || []);
+                useQuestStore.getState().initFromProject(nextActiveId, nextData?.quests || [], nextData?.translations);
             }
 
             return { success: true };
@@ -279,6 +281,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
         const projectData: ProjectData = {
             metadata: updatedMeta,
             quests,
+            translations: useQuestStore.getState().translations,
         };
 
         try {

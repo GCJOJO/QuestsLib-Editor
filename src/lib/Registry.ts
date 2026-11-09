@@ -14,8 +14,8 @@ class Registry {
         label: "Quest",
         fields: [
             { key: "id", label: "Quest ID", type: "text", required: true },
-            { key: "name", label: "Name", type: "text", required: true },
-            { key: "description", label: "Description", type: "text", multiline: true },
+            { key: "name", label: "Name", type: "text", required: true, translatable: true },
+            { key: "description", label: "Description", type: "text", multiline: true, translatable: true },
             { key: "tasks", label: "Tasks", type: "taskList" },
             { key: "rewards", label: "Rewards", type: "rewardList" },
         ]
@@ -149,7 +149,7 @@ registry.registerBaseTask({
     label: "Stat Task",
     fields: [
         { key: "id", label: "Task ID", type: "text", required: true },
-        { key: "name", label: "Name", type: "text" },
+        { key: "name", label: "Name", type: "text", translatable: true },
         {
             key: "stat_type",
             label: "Type",
@@ -185,7 +185,7 @@ registry.registerBaseTask({
     label: "Location Task",
     fields: [
         { key: "id", label: "Task ID", type: "text", required: true },
-        { key: "name", label: "Name", type: "text" },
+        { key: "name", label: "Name", type: "text", translatable: true },
         {
             key: "location_type",
             label: "Type",
@@ -215,7 +215,7 @@ registry.registerBaseTask({
     label: "Any of...",
     fields: [
         { key: "id", label: "Task ID", type: "text", required: true },
-        { key: "name", label: "Name", type: "text" },
+        { key: "name", label: "Name", type: "text", translatable: true },
         { key: "subtasks", label: "Subtasks", type: "taskList", required: true },
         { key: "rewards", label: "Task Rewards", type: "rewardList" },
     ]
@@ -227,7 +227,7 @@ registry.registerBaseTask({
     label: "All of...",
     fields: [
         { key: "id", label: "Task ID", type: "text", required: true },
-        { key: "name", label: "Name", type: "text" },
+        { key: "name", label: "Name", type: "text", translatable: true },
         { key: "subtasks", label: "Subtasks", type: "taskList", required: true },
         { key: "rewards", label: "Task Rewards", type: "rewardList" },
     ]
