@@ -12,6 +12,7 @@
   "dependencies": {
     "idb-keyval": "^6.3.0",
     "immer": "^11.1.21",
+    "lucide-react": "^1.70.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "zustand": "^5.0.15"

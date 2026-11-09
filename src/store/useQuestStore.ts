@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { produce } from "immer";
-import type { QuestData, TaskData } from "../types/QuestTypes";
+import type { QuestData, TaskData, Translations } from "../types/QuestTypes";
 import { useProjectStore } from "./useProjectStore";
 
 type Path = (string | number)[];
@@ -49,14 +49,36 @@ async function persistQuests(quests: QuestData[], onStatusChange: (status: SaveS
     }, 400);
 }
 
+const PREVIEW_LOCALE_KEY = "questslib-editor.preview-locale";
+
+function readPreviewLocale(): string {
+    try {
+        return localStorage.getItem(PREVIEW_LOCALE_KEY) || "en_us";
+    } catch {
+        return "en_us";
+    }
+}
+
 interface QuestStore {
     currentProjectId: string | null;
     quests: QuestData[];
+    /** locale -> clé -> texte, enregistré avec le projet. */
+    translations: Translations;
+    /** Langue dans laquelle les clés de traduction sont affichées. */
+    previewLocale: string;
     selectedQuestId: string | null;
     isLoading: boolean;
     saveStatus: SaveStatus;
 
-    initFromProject: (projectId: string, quests: QuestData[]) => void;
+    initFromProject: (projectId: string, quests: QuestData[], translations?: Translations) => void;
+    setPreviewLocale: (locale: string) => void;
+    setTranslation: (locale: string, key: string, value: string) => void;
+    setTranslations: (translations: Translations) => void;
+    addLocale: (locale: string) => void;
+    removeLocale: (locale: string) => void;
+    renameKey: (oldKey: string, newKey: string) => void;
+    deleteKey: (key: string) => void;
+    moveQuest: (from: number, to: number) => void;
     setSelectedQuest: (id: string | null) => void;
     addQuest: (quest: QuestData) => void;
     deleteQuest: (questId: string) => void;
@@ -68,15 +90,18 @@ interface QuestStore {
 export const useQuestStore = create<QuestStore>((set, get) => ({
     currentProjectId: "project_default",
     quests: DEFAULT_QUESTS,
+    translations: {},
+    previewLocale: readPreviewLocale(),
     selectedQuestId: "questslib:quest_1",
     isLoading: false,
     saveStatus: "saved",
 
-    initFromProject: (projectId, loadedQuests) => {
+    initFromProject: (projectId, loadedQuests, translations) => {
         const nextQuests = loadedQuests && loadedQuests.length > 0 ? loadedQuests : DEFAULT_QUESTS;
         set({
             currentProjectId: projectId,
             quests: nextQuests,
+            translations: translations ?? {},
             selectedQuestId: nextQuests[0]?.id || null,
             isLoading: false,
             saveStatus: "saved",
@@ -84,6 +109,82 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
     },
 
     setSelectedQuest: (id) => set({ selectedQuestId: id }),
+
+    setPreviewLocale: (locale) => {
+        try {
+            localStorage.setItem(PREVIEW_LOCALE_KEY, locale);
+        } catch {
+            // Valable pour cette session seulement.
+        }
+        set({ previewLocale: locale });
+    },
+
+    setTranslation: (locale, key, value) => {
+        const next = produce(get().translations, (draft) => {
+            draft[locale] ??= {};
+            if (value === "") delete draft[locale][key];
+            else draft[locale][key] = value;
+        });
+        set({ translations: next });
+        persistQuests(get().quests, (status) => set({ saveStatus: status }));
+    },
+
+    setTranslations: (translations) => {
+        set({ translations });
+        persistQuests(get().quests, (status) => set({ saveStatus: status }));
+    },
+
+    addLocale: (locale) => {
+        if (get().translations[locale]) return;
+        get().setTranslations({ ...get().translations, [locale]: {} });
+    },
+
+    removeLocale: (locale) => {
+        const next = { ...get().translations };
+        delete next[locale];
+        get().setTranslations(next);
+    },
+
+    renameKey: (oldKey, newKey) => {
+        if (!newKey || oldKey === newKey) return;
+        const next = produce(get().translations, (draft) => {
+            for (const table of Object.values(draft)) {
+                if (oldKey in table) {
+                    table[newKey] = table[oldKey];
+                    delete table[oldKey];
+                }
+            }
+        });
+        // Les quêtes qui utilisaient l'ancienne clé suivent le renommage.
+        const rename = (obj: any) => {
+            if (!obj || typeof obj !== "object") return;
+            for (const field of ["name", "description"]) if (obj[field] === oldKey) obj[field] = newKey;
+            for (const list of ["tasks", "subtasks"]) if (Array.isArray(obj[list])) obj[list].forEach(rename);
+        };
+        const nextQuests = produce(get().quests, (draft) => {
+            draft.forEach(rename);
+        });
+        set({ translations: next, quests: nextQuests });
+        persistQuests(nextQuests, (status) => set({ saveStatus: status }));
+    },
+
+    deleteKey: (key) => {
+        const next = produce(get().translations, (draft) => {
+            for (const table of Object.values(draft)) delete table[key];
+        });
+        get().setTranslations(next);
+    },
+
+    moveQuest: (from, to) => {
+        const quests = get().quests;
+        if (to < 0 || to >= quests.length) return;
+        const nextQuests = produce(quests, (draft) => {
+            const [q] = draft.splice(from, 1);
+            draft.splice(to, 0, q);
+        });
+        set({ quests: nextQuests });
+        persistQuests(nextQuests, (status) => set({ saveStatus: status }));
+    },
 
     addQuest: (quest) => {
         const nextQuests = produce(get().quests, (draft) => {
@@ -129,7 +230,7 @@ export const useQuestStore = create<QuestStore>((set, get) => ({
 
             const copy = JSON.parse(JSON.stringify(draft[originalIndex])) as QuestData;
             copy.id = newQuestId;
-            copy.name = `${copy.name} (Copie)`;
+            
 
             const regenerateTaskIds = (tasks: TaskData[]) => {
                 tasks.forEach((task) => {
