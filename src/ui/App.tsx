@@ -43,7 +43,10 @@ const VIEWS: { id: View; label: string; icon: typeof ScrollText }[] = [
 ];
 
 export function App() {
-    useLang(); // re-rendu de toute l'interface quand la langue change
+    "use no memo";
+    // Le React Compiler mémoïse le JSX et ne voit pas t() comme une dépendance :
+    // la langue sert de clé pour reconstruire toute l'interface quand elle change.
+    const lang = useLang();
     const { quests, selectedQuestId, saveStatus, setSelectedQuest, addQuest, deleteQuest, duplicateQuest, setQuests, translations, previewLocale, setPreviewLocale } =
         useQuestStore();
     const { projects, activeProjectId, loadProjects, selectProject, createProject, getActiveNamespace } = useProjectStore();
@@ -108,7 +111,7 @@ export function App() {
     const localeOptions = [...new Set([...projectLocales, previewLocale])];
 
     return (
-        <div className="app">
+        <div className="app" key={lang}>
             <header className="topbar">
                 <div className="brand">
                     <ScrollText size={18} />
